@@ -141,36 +141,43 @@ class _ResultPageState extends State<ResultPage> {
     String? nextScheduleStr = formValues['nextSchedule'];
     String? updatedFirstName;
     print(nextScheduleStr);
-    if (nextScheduleStr != null && nextScheduleStr != '' &&
-        nextScheduleStr != 'null') {
+    if (nextScheduleStr != null && nextScheduleStr != '' && nextScheduleStr != 'null') {
       this._formValues.nextSchedule = DateTime.parse(nextScheduleStr);
     }
     else {
       this._formValues.nextSchedule = DateTime.now();
     }
 
+    this._dateController.text = DateFormat('dd-MM-yyyy').format(this._formValues.nextSchedule!);
+
     String? ageStr = formValues['age'];
-    if (ageStr != null) {
+    if (ageStr != null && ageStr!='null' && ageStr!='') {
       this._formValues.age = int.tryParse(ageStr);
     } else {
       this._formValues.age = null; // or assign a default value if needed
     }
 
     String? bloodPressureStr = formValues['bloodPressure'];
-    if (bloodPressureStr != null) {
+    if (bloodPressureStr != null && bloodPressureStr!='null' && bloodPressureStr!='') {
      this._formValues.bloodPressure = double.tryParse(bloodPressureStr);
     } else {
-     this._formValues.bloodPressure = null; // or assign a default value if needed
+     this._formValues.bloodPressure = 0.0; // or assign a default value if needed
     }
 
     String? diabetesLevelStr = formValues['diabetesLevel'];
-    if (diabetesLevelStr != null) {
+    if (diabetesLevelStr != null && diabetesLevelStr!='null' && diabetesLevelStr!='') {
       this._formValues.diabetesLevel = double.tryParse(diabetesLevelStr);
     } else {
-     this._formValues.diabetesLevel = null; // or assign a default value if needed
+     this._formValues.diabetesLevel = 0.0; // or assign a default value if needed
     }
 
     print("Date formed is : ${DateFormat('dd-MM-yyyy').parse(_formValues.nextSchedule.toString())}");
+
+    DateTime initialDate = this._formValues.nextSchedule ?? DateTime.now();
+    print(DateFormat('dd-MM-yyyy').format(initialDate));
+    print("Blood Pressure is ${this._formValues.bloodPressure}");
+    print("Diabetes Level is ${this._formValues.diabetesLevel}");
+
 
     // return Scaffold(
     //   appBar: AppBar(
@@ -318,17 +325,20 @@ class _ResultPageState extends State<ResultPage> {
         ),
     GestureDetector(
       onTap: () async {
+        DateTime initialDate = this._formValues.nextSchedule ?? DateTime.now();
+
+
         final selectedDate = await showDatePicker(
           context: context,
-          initialDate: _formValues.nextSchedule ?? DateTime.now(),
+          initialDate: initialDate,
           firstDate: DateTime(1600),
           lastDate: DateTime(2100),
         );
         if (selectedDate != null) {
           setState(() {
             this._formValues.nextSchedule = selectedDate;
-            this._dateController.text = DateFormat('dd-MM-yyyy').format(selectedDate.toLocal());
-            formValues["nextSchedule"] = selectedDate.toString();
+            this._dateController.text = DateFormat('dd-MM-yyyy').format(selectedDate);
+            formValues["nextSchedule"] = DateFormat('yyyy-MM-dd').format(selectedDate);
           });
         }
       },
