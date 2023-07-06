@@ -65,7 +65,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     final response = await http.post(
       Uri.parse(
-          'https://519e-202-131-111-147.in.ngrok.io/speech-to-text/transcribe'),
+          'https://9b3e-111-93-215-130.in.ngrok.io/speech-to-text/transcribe'),
       body: audioData,
       headers: {'Content-Type': 'application/octet-stream'},
     );

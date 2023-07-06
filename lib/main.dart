@@ -42,7 +42,7 @@ class MyApp extends StatelessWidget {
       "prescription": "3 doses of stopache every 6hrs and physical exercise 1hr each day",
       "disease": "meningitis",
       "department": "pediatrician",
-      "nextSchedule": "2024-01-01",
+      "nextSchedule": "2024-01-04",
       "recommendedFood": "lentils and rice",
       "restrictedFood": "junk food such as pizza",
       "bloodPressure": 120.5,
@@ -54,7 +54,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home:  ResultPage(jsonData: formValues),
+      home:  MyHomePage(),
     );
   }
 }

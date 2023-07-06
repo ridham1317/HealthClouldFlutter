@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
 
 class ResultPage extends StatefulWidget {
   final Map<String, dynamic> jsonData;
@@ -26,10 +28,75 @@ class FormValues {
   String? restrictedFood;
   double? bloodPressure;
   double? diabetesLevel;
+
+  FormValues(
+      {this.firstName,
+        this.lastName,
+        this.age,
+        this.gender,
+        this.bloodGroup,
+        this.symptoms,
+        this.prescription,
+        this.disease,
+        this.department,
+        this.nextSchedule,
+        this.recommendedFood,
+        this.restrictedFood,
+        this.bloodPressure,
+        this.diabetesLevel});
+
+  // Default constructor
+  FormValues.defaultConstructor();
+
+  // FormValues(String firstName, String lastName, int age, String gender, String bloodGroup, String symptoms, String prescription, String disease, String department, DateTime nextSchedule, String recommendedFood, String restrictedFood, double bloodPressure, double diabetesLevel){
+  //   this.firstName = firstName;
+  //   this.lastName = lastName;
+  //   this.age = age;
+  //   this.gender = gender;
+  //   this.bloodGroup = bloodGroup;
+  //   this.symptoms = symptoms;
+  //   this.prescription = prescription;
+  //   this.disease = disease;
+  //   this.department = department;
+  //   this.nextSchedule = nextSchedule;
+  //   this.recommendedFood = recommendedFood;
+  //   this.restrictedFood = restrictedFood;
+  //   this.bloodPressure = bloodPressure;
+  //   this.diabetesLevel = diabetesLevel;
+  // }
+
+  @override
+  String toString() {
+    return 'FormValues{firstName: $firstName, lastName: $lastName, age: $age, gender: $gender, bloodGroup: $bloodGroup, symptoms: $symptoms, prescription: $prescription, disease: $disease, department: $department, nextSchedule: $nextSchedule, recommendedFood: $recommendedFood, restrictedFood: $restrictedFood, bloodPressure: $bloodPressure, diabetesLevel: $diabetesLevel}';
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'firstName': firstName,
+      'lastName': lastName,
+      'age': age,
+      'gender': gender,
+      'bloodGroup': bloodGroup,
+      'symptoms': symptoms,
+      'prescription': prescription,
+      'disease': disease,
+      'department': department,
+      'nextSchedule': nextSchedule?.toIso8601String(),
+      'recommendedFood': recommendedFood,
+      'restrictedFood': restrictedFood,
+      'bloodPressure': bloodPressure,
+      'diabetesLevel': diabetesLevel,
+    };
+  }
 }
 
 class _ResultPageState extends State<ResultPage> {
+
   late Map<String, dynamic> formValues;
+  TextEditingController _dateController = TextEditingController();
+  FormValues _formValues = FormValues();
+
+
 
   @override
   void initState() {
@@ -37,58 +104,73 @@ class _ResultPageState extends State<ResultPage> {
     // Initialize form values with the initial field values from jsonData
     formValues = Map.fromEntries(widget.jsonData.entries.map((entry) =>
         MapEntry(entry.key, entry.value.toString())));
+    _dateController = TextEditingController(text: formValues["nextSchedule"].split('-').reversed.join('-'));
+
+     // _formValues = FormValues();
+
+    setState(() {
+      _formValues = FormValues(
+        firstName: formValues['firstName'],
+        lastName: formValues['lastName'],
+        age: formValues['age'] != null ? int.tryParse(formValues['age']) : null,
+        gender: formValues['gender'],
+        bloodGroup: formValues['bloodGroup'],
+        symptoms: formValues['symptoms'],
+        prescription: formValues['prescription'],
+        disease: formValues['disease'],
+        department: formValues['department'],
+        nextSchedule: formValues['nextSchedule'] != null && formValues['nextSchedule']!='null'? DateTime.parse(formValues['nextSchedule']) : DateTime.now(),
+        recommendedFood: formValues['recommendedFood'],
+        restrictedFood: formValues['restrictedFood'],
+        bloodPressure: formValues['bloodPressure'] != null ? double.tryParse(formValues['bloodPressure']) : null,
+        diabetesLevel: formValues['diabetesLevel'] != null ? double.tryParse(formValues['diabetesLevel']) : null,
+      );
+    });
+
+    print("AT the end of Initializaion :$_formValues");
+
   }
 
   @override
   Widget build(BuildContext context) {
 
-    FormValues _formValues = FormValues();
-
-    setState(() {
-      _formValues.firstName = formValues['firstName'];
-      _formValues.lastName = formValues['lastName'];
-      _formValues.gender = formValues['gender'];
-      _formValues.bloodGroup = formValues['bloodGroup'];
-      _formValues.symptoms = formValues['symptoms'];
-      _formValues.prescription = formValues['prescription'];
-      _formValues.disease = formValues['disease'];
-      _formValues.department = formValues['department'];
-      _formValues.restrictedFood=formValues['restrictedFood'];
-      _formValues.recommendedFood = formValues['recommendedFood'];
-    });
-
+    print("Widget Is Building :$_formValues");
     print(formValues['firstName']);
     print(formValues['lastName']);
 
     String? nextScheduleStr = formValues['nextSchedule'];
+    String? updatedFirstName;
     print(nextScheduleStr);
-    if (nextScheduleStr != null && nextScheduleStr!='' && nextScheduleStr!='null') {
-      _formValues.nextSchedule = DateTime.parse(nextScheduleStr);
+    if (nextScheduleStr != null && nextScheduleStr != '' &&
+        nextScheduleStr != 'null') {
+      this._formValues.nextSchedule = DateTime.parse(nextScheduleStr);
     }
-    else{
-      _formValues.nextSchedule = DateTime.now();
+    else {
+      this._formValues.nextSchedule = DateTime.now();
     }
 
     String? ageStr = formValues['age'];
     if (ageStr != null) {
-      _formValues.age = int.tryParse(ageStr);
+      this._formValues.age = int.tryParse(ageStr);
     } else {
-      _formValues.age = null; // or assign a default value if needed
+      this._formValues.age = null; // or assign a default value if needed
     }
 
     String? bloodPressureStr = formValues['bloodPressure'];
     if (bloodPressureStr != null) {
-      _formValues.bloodPressure = double.tryParse(bloodPressureStr);
+     this._formValues.bloodPressure = double.tryParse(bloodPressureStr);
     } else {
-      _formValues.bloodPressure = null; // or assign a default value if needed
+     this._formValues.bloodPressure = null; // or assign a default value if needed
     }
 
     String? diabetesLevelStr = formValues['diabetesLevel'];
     if (diabetesLevelStr != null) {
-      _formValues.diabetesLevel = double.tryParse(diabetesLevelStr);
+      this._formValues.diabetesLevel = double.tryParse(diabetesLevelStr);
     } else {
-      _formValues.diabetesLevel = null; // or assign a default value if needed
+     this._formValues.diabetesLevel = null; // or assign a default value if needed
     }
+
+    print("Date formed is : ${DateFormat('dd-MM-yyyy').parse(_formValues.nextSchedule.toString())}");
 
     // return Scaffold(
     //   appBar: AppBar(
@@ -132,159 +214,195 @@ class _ResultPageState extends State<ResultPage> {
     // );
 
     return Scaffold(
-          appBar: AppBar(
-            title: const Text('Result'),
-          ),
-        body : SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child:
-        Column(
-        children: [
+        appBar: AppBar(
+          title: const Text('Result'),
+        ),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child:
+          Column(
+              children: [
           TextFormField(
-            decoration: InputDecoration(labelText: 'First Name'),
-            initialValue: _formValues.firstName,
-            onChanged: (value) {
-              setState(() {
-                _formValues.firstName = value;
-              });
-            },
-          ),
-          TextFormField(
-            decoration: InputDecoration(labelText: 'Last Name'),
-            initialValue: _formValues.lastName,
-            onChanged: (value) {
-              setState(() {
-                _formValues.lastName = value;
-              });
-            },
-          ),
-          TextFormField(
-            decoration: InputDecoration(labelText: 'Age'),
-            keyboardType: TextInputType.number,
-            initialValue: _formValues.age.toString(),
-            onChanged: (value) {
-              setState(() {
-                _formValues.age = int.tryParse(value);
-              });
-            },
-          ),
-          TextFormField(
-            decoration: InputDecoration(labelText: 'Gender'),
-            initialValue: _formValues.gender,
-            onChanged: (value) {
-              setState(() {
-                _formValues.gender = value;
-              });
-            },
-          ),
-          TextFormField(
-            decoration: InputDecoration(labelText: 'Blood Group'),
-            initialValue: _formValues.bloodGroup,
-            onChanged: (value) {
-              setState(() {
-                _formValues.bloodGroup = value;
-              });
-            },
-          ),
-          TextFormField(
-            decoration: InputDecoration(labelText: 'Symptoms'),
-            initialValue: _formValues.symptoms,
-            onChanged: (value) {
-              setState(() {
-                _formValues.symptoms = value;
-              });
-            },
-          ),
-          TextFormField(
-            decoration: InputDecoration(labelText: 'Prescription'),
-            initialValue: _formValues.prescription,
-            onChanged: (value) {
-              setState(() {
-                _formValues.prescription = value;
-              });
-            },
-          ),
-          TextFormField(
-            decoration: InputDecoration(labelText: 'Disease'),
-            initialValue: _formValues.disease,
-            onChanged: (value) {
-              setState(() {
-                _formValues.disease = value;
-              });
-            },
-          ),
-          TextFormField(
-            decoration: InputDecoration(labelText: 'Department'),
-            initialValue: _formValues.department,
-            onChanged: (value) {
-              setState(() {
-                _formValues.department = value;
-              });
-            },
-          ),
-          GestureDetector(
-            onTap: () {
-              showDatePicker(
-                context: context,
-                initialDate: DateTime.now(),
-                firstDate: DateTime.now(),
-                lastDate: DateTime(2100),
-              ).then((selectedDate) {
-                if (selectedDate != null) {
-                  setState(() {
-                    _formValues.nextSchedule = selectedDate;
-                    print(_formValues.nextSchedule);
-                  });
-                }
-              });
-            },
-            child: AbsorbPointer(
-              child: TextFormField(
-                controller: TextEditingController(
-                  text: _formValues.nextSchedule?.toString() ?? '',
+          decoration: InputDecoration(labelText: 'First Name'),
+          initialValue: this._formValues.firstName,
+
+          onChanged: (value) {
+            setState(() {
+              print(value);
+              this._formValues.firstName = value;
+              // _formValues.
+              print("===============$_formValues");
+              updatedFirstName = value;
+            });
+          },
+        ),
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Last Name'),
+          initialValue: _formValues.lastName,
+          onChanged: (value) {
+            setState(() {
+              this._formValues.lastName = value;
+            });
+          },
+        ),
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Age'),
+          keyboardType: TextInputType.number,
+          initialValue: _formValues.age != null ? _formValues.age.toString() : '',
+          onSaved: (value) {
+              this._formValues.age = int.tryParse(value!);
+          },
+          onChanged: (value) {
+            setState(() {
+              this._formValues.age = int.tryParse(value);
+              formValues["age"] = value;
+              print("age-------------------:${this._formValues}");
+            });
+          },
+        ),
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Gender'),
+          initialValue: _formValues.gender,
+          onChanged: (value) {
+            setState(() {
+              this._formValues.gender = value;
+            });
+          },
+        ),
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Blood Group'),
+          initialValue: _formValues.bloodGroup,
+          onChanged: (value) {
+            setState(() {
+              this._formValues.bloodGroup = value;
+            });
+          },
+        ),
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Symptoms'),
+          initialValue: _formValues.symptoms,
+          onChanged: (value) {
+            setState(() {
+              this._formValues.symptoms = value;
+            });
+          },
+        ),
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Prescription'),
+          initialValue: _formValues.prescription,
+          onChanged: (value) {
+            setState(() {
+              this._formValues.prescription = value;
+            });
+          },
+        ),
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Disease'),
+          initialValue: _formValues.disease,
+          onChanged: (value) {
+            setState(() {
+              this._formValues.disease = value;
+            });
+          },
+        ),
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Department'),
+          initialValue: _formValues.department,
+
+          onChanged: (value) {
+            print(value);
+            setState(() {
+              this._formValues.department = value;
+            });
+          },
+        ),
+    GestureDetector(
+      onTap: () async {
+        final selectedDate = await showDatePicker(
+          context: context,
+          initialDate: _formValues.nextSchedule ?? DateTime.now(),
+          firstDate: DateTime(1600),
+          lastDate: DateTime(2100),
+        );
+        if (selectedDate != null) {
+          setState(() {
+            this._formValues.nextSchedule = selectedDate;
+            this._dateController.text = DateFormat('dd-MM-yyyy').format(selectedDate.toLocal());
+            formValues["nextSchedule"] = selectedDate.toString();
+          });
+        }
+      },
+      child: TextFormField(
+        controller: _dateController,
+        decoration: InputDecoration(
+          labelText: 'Next Schedule',
+          suffixIcon: Icon(Icons.calendar_today),
+        ),
+        enabled: false, // Disable user editing
+      ),
+    )
+    ,
+
+    TextFormField(
+    decoration: InputDecoration(labelText: 'Restricted Food'),
+    initialValue: _formValues.restrictedFood,
+    onChanged: (value) {
+    setState(() {
+      this._formValues.restrictedFood = value;
+    });
+    },
+    ),
+    TextFormField(
+    decoration: InputDecoration(labelText: 'Blood Pressure'),
+    initialValue: _formValues.bloodPressure.toString(),
+    keyboardType: TextInputType.numberWithOptions(decimal: true),
+    onChanged: (value) {
+    setState(() {
+      this._formValues.bloodPressure = double.tryParse(value);
+      formValues["bloodPressure"] = value;
+    });
+    },
+    ),
+    TextFormField(
+    decoration: InputDecoration(labelText: 'Diabetes Level'),
+    initialValue: _formValues.diabetesLevel.toString(),
+    keyboardType: TextInputType.numberWithOptions(decimal: true),
+    onChanged: (value) {
+    setState(() {
+      this._formValues.diabetesLevel = double.tryParse(value);
+      formValues["diabetesLevel"] = value;
+    });
+    },
+    ),
+    // Repeat the pattern for other fields
+    // ...
+                Container(
+                  width: 100, // Set the width as per your layout requirements
+                  margin: EdgeInsets.all(16.0), // Set the margin as per your layout requirements
+                  child: ElevatedButton(
+                      onPressed: () async {
+                        print("FOrm Values-----------------------------------------${this._formValues}");
+                        print("updated firstname : $updatedFirstName");
+                        print(_formValues);
+                        final response = await http.post(
+                          Uri.parse('http://192.1.150.116:8080/medicalForm/patientForm'),
+                          body: jsonEncode(this._formValues.toJson()),
+                          headers: {'Content-Type': 'application/json'},
+                        );
+
+                        if (response.statusCode == 200) {
+                          print(response.body);
+                        } else {
+                          print(response.statusCode);
+                        }
+                      },
+                    child: Text('Save'),
+                  ),
                 ),
-                decoration: InputDecoration(
-                  labelText: 'Next Schedule',
-                  suffixIcon: Icon(Icons.calendar_today),
-                ),
-              ),
-            ),
-          ),
-          TextFormField(
-            decoration: InputDecoration(labelText: 'Restricted Food'),
-            initialValue: _formValues.restrictedFood,
-            onChanged: (value) {
-              setState(() {
-                _formValues.restrictedFood = value;
-              });
-            },
-          ),
-          TextFormField(
-            decoration: InputDecoration(labelText: 'Blood Pressure'),
-            initialValue: _formValues.bloodPressure.toString(),
-            keyboardType: TextInputType.numberWithOptions(decimal: true),
-            onChanged: (value) {
-              setState(() {
-                _formValues.bloodPressure = double.tryParse(value);
-              });
-            },
-          ),
-          TextFormField(
-            decoration: InputDecoration(labelText: 'Diabetes Level'),
-            initialValue: _formValues.diabetesLevel.toString(),
-            keyboardType: TextInputType.numberWithOptions(decimal: true),
-            onChanged: (value) {
-              setState(() {
-                _formValues.diabetesLevel = double.tryParse(value);
-              });
-            },
-          ),
-          // Repeat the pattern for other fields
-          // ...
-        ],
+    ],
     ),
 
-        )
+    )
     );
   }
 }
