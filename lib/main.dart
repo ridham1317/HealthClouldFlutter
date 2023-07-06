@@ -1,20 +1,3 @@
-//
-// import 'package:flutter/material.dart';
-//
-// import 'Gradient_container.dart';
-//
-// void main() {
-//   runApp(
-//      const MaterialApp(
-//       home: Scaffold(
-//         body: GradientContainer(),
-//       ),
-//     ),
-//   );
-// }
-//
-//
-//
 
 import 'package:flutter/material.dart';
 import 'package:speech_to_text_demo/views/ResultPage.dart';

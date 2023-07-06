@@ -61,15 +61,20 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> sendAudioToServer(File audioFile) async {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return Center(child: CircularProgressIndicator());
+        });
     final audioData = await audioFile.readAsBytes();
 
     final response = await http.post(
-      Uri.parse(
-          'https://9b3e-111-93-215-130.in.ngrok.io/speech-to-text/transcribe'),
+      Uri.parse('http://192.1.150.88:8080/speech-to-text/transcribe'),
       body: audioData,
       headers: {'Content-Type': 'application/octet-stream'},
     );
-    print(response);
+    Navigator.of(context).pop();
+
     if (response.statusCode == 200) {
       final decodedData = jsonDecode(response.body) as Map<String, dynamic>;
       Navigator.push(
