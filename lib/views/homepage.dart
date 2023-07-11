@@ -40,7 +40,10 @@ class _MyHomePageState extends State<MyHomePage> {
       throw 'Permission not granted';
     }
     await recorder.openRecorder();
-    recorder.setSubscriptionDuration(const Duration(milliseconds: 500));
+    recorder.setSubscriptionDuration(const Duration(milliseconds: 500)); // Sets the frequency at which duration updates are sent to duration listeners.
+    final defaultButtonColor = ThemeData().elevatedButtonTheme.style?.backgroundColor;
+
+    print(defaultButtonColor);
   }
 
   Future startRecord() async {
@@ -69,13 +72,13 @@ class _MyHomePageState extends State<MyHomePage> {
     final audioData = await audioFile.readAsBytes();
 
     final response = await http.post(
-      Uri.parse('http://192.1.150.88:8080/speech-to-text/transcribe'),
+      Uri.parse('http://192.1.150.116:8080/speech-to-text/transcribe'),
       body: audioData,
       headers: {'Content-Type': 'application/octet-stream'},
     );
     Navigator.of(context).pop();
-
     if (response.statusCode == 200) {
+      print(response.body);
       final decodedData = jsonDecode(response.body) as Map<String, dynamic>;
       Navigator.push(
         context,

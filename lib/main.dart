@@ -1,11 +1,10 @@
 
 import 'package:flutter/material.dart';
-import 'package:speech_to_text_demo/views/ResultPage.dart';
 
 import 'views/homepage.dart';
 
 void main() {
-  runApp( MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -33,7 +32,7 @@ class MyApp extends StatelessWidget {
     };
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
+      title: 'Speech To Text POC',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),

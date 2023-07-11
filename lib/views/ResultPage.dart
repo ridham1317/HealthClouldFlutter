@@ -139,12 +139,8 @@ class _ResultPageState extends State<ResultPage> {
   @override
   Widget build(BuildContext context) {
     print("Widget Is Building :$_formValues");
-    print(formValues['firstName']);
-    print(formValues['lastName']);
 
     String? nextScheduleStr = formValues['nextSchedule'];
-    String? updatedFirstName;
-    print(nextScheduleStr);
     if (nextScheduleStr != null &&
         nextScheduleStr != '' &&
         nextScheduleStr != 'null') {
@@ -182,9 +178,6 @@ class _ResultPageState extends State<ResultPage> {
       this._formValues.diabetesLevel =
           0.0; // or assign a default value if needed
     }
-
-    DateTime initialDate = this._formValues.nextSchedule ?? DateTime.now();
-
     return Scaffold(
         appBar: AppBar(
           title: const Text('Result'),
@@ -198,11 +191,7 @@ class _ResultPageState extends State<ResultPage> {
                 initialValue: this._formValues.firstName,
                 onChanged: (value) {
                   setState(() {
-                    print(value);
                     this._formValues.firstName = value;
-                    // _formValues.
-                    print("===============$_formValues");
-                    updatedFirstName = value;
                   });
                 },
               ),
@@ -220,14 +209,10 @@ class _ResultPageState extends State<ResultPage> {
                 keyboardType: TextInputType.number,
                 initialValue:
                     _formValues.age != null ? _formValues.age.toString() : '',
-                onSaved: (value) {
-                  this._formValues.age = int.tryParse(value!);
-                },
                 onChanged: (value) {
                   setState(() {
                     this._formValues.age = int.tryParse(value);
                     formValues["age"] = value;
-                    print("age-------------------:${this._formValues}");
                   });
                 },
               ),
@@ -435,7 +420,7 @@ class _ResultPageState extends State<ResultPage> {
                   onPressed: () async {
                     final response = await http.post(
                       Uri.parse(
-                          'http://192.1.150.88:8080/medicalForm/patientForm'),
+                          'http://192.1.150.116:8080/medicalForm/patientForm'),
                       body: jsonEncode(this._formValues.toJson()),
                       headers: {'Content-Type': 'application/json'},
                     );
