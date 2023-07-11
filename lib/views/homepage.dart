@@ -20,10 +20,12 @@ class _MyHomePageState extends State<MyHomePage> {
   final recorder = FlutterSoundRecorder();
   final player = FlutterSoundPlayer();
   late String _filePath; // File path for the recorded audio
+  late String selectedLanguage;
 
   @override
   void initState() {
     super.initState();
+    selectedLanguage = 'English';
     initRecorder();
   }
 
@@ -40,8 +42,11 @@ class _MyHomePageState extends State<MyHomePage> {
       throw 'Permission not granted';
     }
     await recorder.openRecorder();
-    recorder.setSubscriptionDuration(const Duration(milliseconds: 500)); // Sets the frequency at which duration updates are sent to duration listeners.
-    final defaultButtonColor = ThemeData().elevatedButtonTheme.style?.backgroundColor;
+    recorder.setSubscriptionDuration(const Duration(
+        milliseconds:
+            500)); // Sets the frequency at which duration updates are sent to duration listeners.
+    final defaultButtonColor =
+        ThemeData().elevatedButtonTheme.style?.backgroundColor;
 
     print(defaultButtonColor);
   }
@@ -59,11 +64,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future stopRecorder() async {
     await recorder.stopRecorder();
-    print('Recorded file path: $_filePath');
-    await sendAudioToServer(File(_filePath));
   }
 
-  Future<void> sendAudioToServer(File audioFile) async {
+  Future<void> sendAudioToServer(
+      File audioFile, String selectedLanguageCode) async {
     showDialog(
         context: context,
         builder: (context) {
@@ -71,8 +75,16 @@ class _MyHomePageState extends State<MyHomePage> {
         });
     final audioData = await audioFile.readAsBytes();
 
+    final Map<String, dynamic> requestData = {
+      'audioData': audioData,
+      'lang': selectedLanguageCode,
+      // Add more parameters as needed
+    };
+
     final response = await http.post(
-      Uri.parse('http://192.1.150.116:8080/speech-to-text/transcribe'),
+      // Uri.parse('http://192.1.150.116:8080/speech-to-text/transcribe'),
+      Uri.parse('http://192.1.150.88:8080/speech-to-text/transcribe?language=' +
+          selectedLanguageCode),
       body: audioData,
       headers: {'Content-Type': 'application/octet-stream'},
     );
@@ -147,6 +159,67 @@ class _MyHomePageState extends State<MyHomePage> {
                 Icons.play_arrow,
                 size: 100,
               ),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                RadioTheme(
+                  data: RadioThemeData(
+                      fillColor: MaterialStateColor.resolveWith(
+                          (states) => Colors.white)),
+                  child: Expanded(
+                    child: ListTile(
+                      title: const Text('English',
+                          style: TextStyle(color: Colors.white)),
+                      leading: Radio(
+                        value: 'English',
+                        groupValue: selectedLanguage,
+                        onChanged: (value) {
+                          setState(() {
+                            selectedLanguage = value!;
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+                RadioTheme(
+                  data: RadioThemeData(
+                      fillColor: MaterialStateColor.resolveWith(
+                          (states) => Colors.white)),
+                  child: Expanded(
+                    child: ListTile(
+                      title: const Text('Gujarati',
+                          style: TextStyle(color: Colors.white)),
+                      leading: Radio(
+                        value: 'Gujarati',
+                        groupValue: selectedLanguage,
+                        onChanged: (value) {
+                          setState(() {
+                            selectedLanguage = value!;
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 100),
+            ElevatedButton(
+              onPressed: () async {
+                String selectedLanguageCode =
+                    (selectedLanguage == 'English') ? 'en-IN' : 'gu-IN';
+                await sendAudioToServer(File(_filePath), selectedLanguageCode);
+              },
+              style: ButtonStyle(
+                fixedSize: MaterialStateProperty.all<Size>(
+                  const Size(200,
+                      50), // Set the desired width and height of the button
+                ),
+              ),
+              child: const Text('Translate'),
             ),
           ],
         ),

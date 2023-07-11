@@ -420,7 +420,7 @@ class _ResultPageState extends State<ResultPage> {
                   onPressed: () async {
                     final response = await http.post(
                       Uri.parse(
-                          'http://192.1.150.116:8080/medicalForm/patientForm'),
+                          'http://192.1.150.88:8080/medicalForm/patientForm'),
                       body: jsonEncode(this._formValues.toJson()),
                       headers: {'Content-Type': 'application/json'},
                     );
