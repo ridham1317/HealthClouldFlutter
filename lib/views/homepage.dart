@@ -82,9 +82,9 @@ class _MyHomePageState extends State<MyHomePage> {
     };
 
     final response = await http.post(
-      // Uri.parse('http://192.1.150.116:8080/speech-to-text/transcribe'),
-      Uri.parse('http://192.1.150.88:8080/speech-to-text/transcribe?language=' +
-          selectedLanguageCode),
+      Uri.parse('http://192.1.150.116:8080/speech-to-text/transcribe?language='+selectedLanguageCode),
+      // Uri.parse('http://192.1.150.88:8080/speech-to-text/transcribe?language=' +
+      //     selectedLanguageCode),
       body: audioData,
       headers: {'Content-Type': 'application/octet-stream'},
     );
